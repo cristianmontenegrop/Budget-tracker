@@ -4,6 +4,9 @@ const FILES_TO_CACHE = [
   "/css/styles.css",
   "/manifest.json",
   "/js/index.js",
+  "/js/indexedDb.js",
+  "/icons/icon-192x192.png",
+  "/icons/icon-512x512.png",
   // "/favorites.html",
   // "/topic.html",
   // "/dist/app.bundle.js",
@@ -38,21 +41,20 @@ self.addEventListener("activate", event => {
 });
 
 self.addEventListener("fetch", event => {
-  if (event.request.url.startsWith(self.location.origin)) {
+  if (event.request.url.includes("/api/")) {
+    // make network request and fallback to cache if network request fails (offline)
     event.respondWith(
-      caches.match(event.request).then(cachedResponse => {
-        if (cachedResponse) {
-          return cachedResponse;
-        }
-
-        return caches.open(RUNTIME).then(cache => {
-          return fetch(event.request).then(response => {
-            return cache.put(event.request, response.clone()).then(() => {
-              return response;
-            });
-          });
-        });
+      caches.open(RUNTIME).then(cache => {
+        return fetch(event.request)
+          .then(response => {
+            if (response.status === 200) {
+              cache.put(event.request.url, response.clone());
+            }
+            return response;
+          })
+          .catch(() => caches.match(event.request));
       })
     );
+    return;
   }
 });

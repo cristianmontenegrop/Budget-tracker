@@ -8,10 +8,18 @@ fetch("/api/transaction")
   .then(data => {
     // save db data on global variable
     transactions = data;
-
+    console.log("Transactions GETMongo ", transactions)
     populateTotal();
     populateTable();
     populateChart();
+  }).catch(err => {
+    // useIndexedDb("budgetAppTransactions", "transactions", "get").then(data => {
+    //   transactions = data;
+    //   console.log("Catch Get IndexedDb initiated, transactions: ", transactions)
+    //   populateTotal();
+    //   populateTable();
+    //   populateChart();
+    // });
   });
 
 function populateTotal() {
@@ -66,14 +74,14 @@ function populateChart() {
 
   myChart = new Chart(ctx, {
     type: 'line',
-      data: {
-        labels,
-        datasets: [{
-            label: "Total Over Time",
-            fill: true,
-            backgroundColor: "#6666ff",
-            data
-        }]
+    data: {
+      labels,
+      datasets: [{
+        label: "Total Over Time",
+        fill: true,
+        backgroundColor: "#6666ff",
+        data
+      }]
     }
   });
 }
@@ -111,7 +119,7 @@ function sendTransaction(isAdding) {
   populateChart();
   populateTable();
   populateTotal();
-  
+
   // also send to server
   fetch("/api/transaction", {
     method: "POST",
@@ -121,33 +129,57 @@ function sendTransaction(isAdding) {
       "Content-Type": "application/json"
     }
   })
-  .then(response => {    
-    return response.json();
-  })
-  .then(data => {
-    if (data.errors) {
-      errorEl.textContent = "Missing Information";
-    }
-    else {
+    .then(response => {
+      return response.json();
+    })
+    .then(data => {
+      if (data.errors) {
+        errorEl.textContent = "Missing Information";
+      }
+      else {
+        // clear form
+        nameEl.value = "";
+        amountEl.value = "";
+      }
+    })
+    .catch(err => {
+      // fetch failed, so save in indexed db
+      console.log("Attempting to run saveRecord", transaction);
+      saveRecord(transaction);
+
       // clear form
       nameEl.value = "";
       amountEl.value = "";
-    }
-  })
-  .catch(err => {
-    // fetch failed, so save in indexed db
-    saveRecord(transaction);
-
-    // clear form
-    nameEl.value = "";
-    amountEl.value = "";
-  });
+    });
 }
 
-document.querySelector("#add-btn").onclick = function() {
+window.addEventListener('online', function () {
+  console.log('online');
+
+  getAllRecords().then(indexedTransactions => {
+
+    console.log("bulk transactions: ", indexedTransactions);
+
+    fetch("/api/transaction/bulk", {
+      method: "POST",
+      body: JSON.stringify(indexedTransactions),
+      headers: {
+        'Content-Type': 'application/json'
+        // 'Content-Type': 'application/x-www-form-urlencoded',
+      }
+    }).then(response => {
+      console.log("response from POST BULK: ", response);
+      deleteAllRecords();
+      return response.json();
+    }).catch(err => console.log(err));
+  });
+});
+
+document.querySelector("#add-btn").onclick = function () {
   sendTransaction(true);
 };
 
-document.querySelector("#sub-btn").onclick = function() {
+document.querySelector("#sub-btn").onclick = function () {
   sendTransaction(false);
 };
+
