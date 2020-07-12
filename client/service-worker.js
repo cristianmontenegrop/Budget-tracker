@@ -7,13 +7,7 @@ const FILES_TO_CACHE = [
   "/js/indexedDb.js",
   "/icons/icon-192x192.png",
   "/icons/icon-512x512.png",
-  // "/favorites.html",
-  // "/topic.html",
-  // "/dist/app.bundle.js",
-  // "/dist/favorites.bundle.js",
-  // "/dist/topic.bundle.js"
 ];
-
 
 const PRECACHE = "precache-v1";
 const RUNTIME = "runtime";

@@ -13,13 +13,6 @@ fetch("/api/transaction")
     populateTable();
     populateChart();
   }).catch(err => {
-    // useIndexedDb("budgetAppTransactions", "transactions", "get").then(data => {
-    //   transactions = data;
-    //   console.log("Catch Get IndexedDb initiated, transactions: ", transactions)
-    //   populateTotal();
-    //   populateTable();
-    //   populateChart();
-    // });
   });
 
 function populateTotal() {
@@ -165,7 +158,6 @@ window.addEventListener('online', function () {
       body: JSON.stringify(indexedTransactions),
       headers: {
         'Content-Type': 'application/json'
-        // 'Content-Type': 'application/x-www-form-urlencoded',
       }
     }).then(response => {
       console.log("response from POST BULK: ", response);

@@ -49,7 +49,6 @@ function useIndexedDb(databaseName, storeName, method, object) {
   });
 }
 
-
 function saveRecord({ name, value, date }) {
   useIndexedDb("budgetAppTransactions", "transactions", "put", {
     _id: name,
