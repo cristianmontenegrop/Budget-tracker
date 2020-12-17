@@ -24,7 +24,15 @@
 
 ## Description
 
-Web Application that enables user with excercise routine logging and viewing capabilities, giving the user the 
+Web Application that enables user with budget or cash flow tracking functionality featuring offline useability
+
+- Enter deposits offline
+
+- Enter expenses offline
+
+- When back online, entries get updated to the server.
+
+- Independent APP (PWA) version available, follow the initial prompt when you go in the website. 
 
 ## Technologies
 
