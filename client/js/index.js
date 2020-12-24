@@ -126,6 +126,7 @@ function sendTransaction(isAdding) {
 }
 async function initiateApp() {
   await getAllRecords().then((indexedTransactions) => {
+    console.log('indexedTransactions', indexedTransactions);
     transactions = indexedTransactions.concat(transactions);
   });
 

@@ -1,82 +1,6 @@
-// function checkForIndexedDb() {
-//   if (!window.indexedDB) {
-//     console.log('Your browser doesn\'t support a stable version of IndexedDB.');
-//     return false;
-//   }
-//   return true;
-// }
-
-// function useIndexedDb(databaseName, storeName, method, object) {
-//   return new Promise((resolve, reject) => {
-//     const request = window.indexedDB.open(databaseName, 1);
-//     let db;
-//     let tx;
-//     let store;
-
-//     request.onupgradeneeded = () => {
-//       const dbase = request.result;
-//       dbase.createObjectStore(storeName, { keyPath: '_id' });
-//     };
-
-//     request.onerror = (e) => {
-//       console.log('There was an error', e);
-//     };
-
-//     request.onsuccess = () => {
-//       db = request.result;
-//       tx = db.transaction(storeName, 'readwrite');
-//       store = tx.objectStore(storeName);
-
-//       db.onerror = (er) => console.log('error', er);
-//       if (method === 'put') {
-//         store.put(object);
-//       } else if (method === 'get') {
-//         const all = store.getAll();
-//         all.onsuccess = () => resolve(all.result);
-//       } else if (method === 'delete') {
-//         store.delete(object._id);
-//       } else if (method === 'clear') {
-//         store.clear();
-//       }
-//       tx.oncomplete = () => db.close();
-//     };
-//   });
-// }
-
-// function saveRecord({ name, value, date }) {
-//   useIndexedDb('budgetAppTransactions', 'transactions', 'put', {
-//     _id: name,
-//     name,
-//     value,
-//     date,
-//   }).catch((err) => {
-//     console.log('IndexedDb error: ', err);
-//   });
-// }
-
-// async function getAllRecords(req, res) {
-//   const bulkTransactions = [];
-//   await useIndexedDb('budgetAppTransactions', 'transactions', 'get')
-//     .then((resp) => {
-//       resp.map((e) => bulkTransactions.push({ name: e.name, value: e.value, date: e.date }));
-//     });
-//   console.log('bulkTransactions', bulkTransactions);
-//   res = bulkTransactions;
-//   console.log(bulkTransactions);
-//   return res;
-// }
-
-// function deleteAllRecords() {
-//   useIndexedDb('budgetAppTransactions', 'transactions', 'clear')
-//     .then((res) => {
-//       console.log('clear indexedDb response: ', res);
-//     })
-//     .catch((err) => console.log(err));
-// }
-
 function checkForIndexedDb() {
   if (!window.indexedDB) {
-    console.log("Your browser doesn't support a stable version of IndexedDB.");
+    console.log('Your browser doesn\'t support a stable version of IndexedDB.');
     return false;
   }
   return true;
@@ -85,77 +9,58 @@ function checkForIndexedDb() {
 function useIndexedDb(databaseName, storeName, method, object) {
   return new Promise((resolve, reject) => {
     const request = window.indexedDB.open(databaseName, 1);
-    let db,
-      tx,
-      store;
+    let db;
+    let tx;
+    let store;
 
-    request.onupgradeneeded = function (e) {
-      const db = request.result;
-      db.createObjectStore(storeName, { keyPath: "_id" });
+    request.onupgradeneeded = () => {
+      const dbase = request.result;
+      dbase.createObjectStore(storeName, { keyPath: '_id' });
     };
 
-    request.onerror = function (e) {
-      console.log("There was an error");
-    };
+    request.onerror = (err) => console.log('There was an error', err);
 
-    request.onsuccess = function (e) {
+    request.onsuccess = () => {
       db = request.result;
-      tx = db.transaction(storeName, "readwrite");
+      tx = db.transaction(storeName, 'readwrite');
       store = tx.objectStore(storeName);
 
-      db.onerror = function (e) {
-        console.log("error");
-      };
-      if (method === "put") {
+      db.onerror = (err) => console.log('error', err);
+      if (method === 'put') {
         store.put(object);
-      } else if (method === "get") {
+      } else if (method === 'get') {
         const all = store.getAll();
-        all.onsuccess = function () {
-          resolve(all.result);
-        };
-      } else if (method === "delete") {
+        all.onsuccess = () => resolve(all.result);
+      } else if (method === 'delete') {
         store.delete(object._id);
-      } else if (method === "clear") {
-        store.clear()
+      } else if (method === 'clear') {
+        store.clear();
       }
-      tx.oncomplete = function () {
-        db.close();
-      };
+      tx.oncomplete = () => db.close();
     };
   });
 }
 
 function saveRecord({ name, value, date }) {
-  useIndexedDb("budgetAppTransactions", "transactions", "put", {
+  useIndexedDb('budgetAppTransactions', 'transactions', 'put', {
     _id: name,
-    name: name,
-    value: value,
-    date: date
-  }).catch(err => {
-    console.log("IndexedDb error: ", err)
-  });
-};
+    name,
+    value,
+    date,
+  }).catch((err) => console.log('IndexedDb error: ', err));
+}
 
-async function getAllRecords(req, res) {
-  console.log('getAllRecords Executed');
+async function getAllRecords() {
   const bulkTransactions = [];
-  await useIndexedDb("budgetAppTransactions", "transactions", "get")
-    .then(res => {
-      res.map(e => {
-        bulkTransactions.push({ name: e.name, value: e.value, date: e.date });
-      });
-    });
-  res = bulkTransactions;
-  console.log('resData: ', res);
-  return res;
-};
+  await useIndexedDb('budgetAppTransactions', 'transactions', 'get').catch((err) => console.log('err:', err))
+    .then((resp) => resp.map((e) => bulkTransactions
+      .push({ name: e.name, value: e.value, date: e.date })));
+
+  return bulkTransactions;
+}
 
 function deleteAllRecords() {
-  useIndexedDb("budgetAppTransactions", "transactions", "clear")
-    .then(res => {
-      console.log("clear indexedDb response: ", res);
-    })
-    .catch(err => console.log(err));
-};
-
-// getAllRecords();
+  useIndexedDb('budgetAppTransactions', 'transactions', 'clear')
+    .then((res) => console.log('clear indexedDb response: ', res))
+    .catch((err) => console.log('err:', err));
+}
