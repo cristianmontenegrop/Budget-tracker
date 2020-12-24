@@ -125,8 +125,26 @@ function sendTransaction(isAdding) {
     });
 }
 async function initiateApp() {
-  await getAllRecords().then((indexedTransactions) => {
+  // Check for indexed records, if so, add to the transactions
+  await getAllRecords().then((res) => {
+    let indexedTransactions = res;
     console.log('indexedTransactions', indexedTransactions);
+
+    // If the Service Worker didn't generate the POST and clear indexedDB after going back online
+    if (window.navigator.onLine && !(indexedTransactions.length === 0)) {
+      fetch('/api/transaction/bulk', {
+        method: 'POST',
+        body: JSON.stringify(indexedTransactions),
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      }).then((response) => {
+        console.log('response from POST BULK: ', response);
+        deleteAllRecords();
+        indexedTransactions = [];
+        return response.json();
+      }).catch((err) => console.log(err));
+    }
     transactions = indexedTransactions.concat(transactions);
   });
 
