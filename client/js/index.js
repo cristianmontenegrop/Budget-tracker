@@ -150,38 +150,6 @@ function sendTransaction(isAdding) {
     });
 }
 
-// add IndexedDb when Offline constantly
-// window.addEventListener('offline', () => {
-//   console.log('(Working Offline)');
-//   getAllRecords().then(indexedTransactions => {
-//     console.log('indexedDb holds: ', indexedTransactions);
-//     transactions = indexedTransactions.concat(transactions);
-//   });
-// });
-
-
-// window.addEventListener('online', () => {
-//   console.log('(Working Online)');
-
-
-//   getAllRecords().then(indexedTransactions => {
-
-//     console.log("bulk transactions: ", indexedTransactions);
-
-//     fetch("/api/transaction/bulk", {
-//       method: "POST",
-//       body: JSON.stringify(indexedTransactions),
-//       headers: {
-//         'Content-Type': 'application/json'
-//       }
-//     }).then(response => {
-//       console.log("response from POST BULK: ", response);
-//       deleteAllRecords();
-//       return response.json();
-//     }).catch(err => console.log(err));
-//   });
-// });
-
 initiateApp();
 
 document.querySelector("#add-btn").onclick = function () {
