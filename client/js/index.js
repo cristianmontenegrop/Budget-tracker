@@ -1,19 +1,23 @@
 let transactions = [];
 let myChart;
 
-fetch("/api/transaction")
-  .then(response => {
-    return response.json();
-  })
-  .then(data => {
-    // save db data on global variable
-    transactions = data;
-    console.log("Transactions GETMongo ", transactions)
-    populateTotal();
-    populateTable();
-    populateChart();
-  }).catch(err => {
+async function initiateApp() {
+  await getAllRecords().then(indexedTransactions => {
+    transactions = indexedTransactions.concat(transactions);
   });
+
+  fetch("/api/transaction")
+    .then(response => response.json())
+    .then(data => {
+    // save db data on global variable
+      transactions = transactions.concat(data);
+      populateTotal();
+      populateTable();
+      populateChart();
+    }).catch(err => {
+      console.log("err", err);
+  });
+};
 
 function populateTotal() {
   // reduce transaction amounts to a single total value
@@ -97,7 +101,7 @@ function sendTransaction(isAdding) {
   let transaction = {
     name: nameEl.value,
     value: amountEl.value,
-    date: new Date().toISOString()
+    date: new Date().toISOString(),
   };
 
   // if subtracting funds, convert amount to negative number
@@ -146,31 +150,43 @@ function sendTransaction(isAdding) {
     });
 }
 
-window.addEventListener('online', function () {
-  console.log('online');
+// add IndexedDb when Offline constantly
+// window.addEventListener('offline', () => {
+//   console.log('(Working Offline)');
+//   getAllRecords().then(indexedTransactions => {
+//     console.log('indexedDb holds: ', indexedTransactions);
+//     transactions = indexedTransactions.concat(transactions);
+//   });
+// });
 
-  getAllRecords().then(indexedTransactions => {
 
-    console.log("bulk transactions: ", indexedTransactions);
+// window.addEventListener('online', () => {
+//   console.log('(Working Online)');
 
-    fetch("/api/transaction/bulk", {
-      method: "POST",
-      body: JSON.stringify(indexedTransactions),
-      headers: {
-        'Content-Type': 'application/json'
-      }
-    }).then(response => {
-      console.log("response from POST BULK: ", response);
-      deleteAllRecords();
-      return response.json();
-    }).catch(err => console.log(err));
-  });
-});
+
+//   getAllRecords().then(indexedTransactions => {
+
+//     console.log("bulk transactions: ", indexedTransactions);
+
+//     fetch("/api/transaction/bulk", {
+//       method: "POST",
+//       body: JSON.stringify(indexedTransactions),
+//       headers: {
+//         'Content-Type': 'application/json'
+//       }
+//     }).then(response => {
+//       console.log("response from POST BULK: ", response);
+//       deleteAllRecords();
+//       return response.json();
+//     }).catch(err => console.log(err));
+//   });
+// });
+
+initiateApp();
 
 document.querySelector("#add-btn").onclick = function () {
   sendTransaction(true);
 };
-
 document.querySelector("#sub-btn").onclick = function () {
   sendTransaction(false);
 };
