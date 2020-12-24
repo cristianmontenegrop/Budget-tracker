@@ -126,13 +126,13 @@ function sendTransaction(isAdding) {
 }
 async function initiateApp() {
   // Check for indexed records, if so, add to the transactions
-  await getAllRecords().then((res) => {
+  await getAllRecords().then(async (res) => {
     let indexedTransactions = res;
     console.log('indexedTransactions', indexedTransactions);
 
     // If the Service Worker didn't generate the POST and clear indexedDB after going back online
     if (window.navigator.onLine && !(indexedTransactions.length === 0)) {
-      fetch('/api/transaction/bulk', {
+      await fetch('/api/transaction/bulk', {
         method: 'POST',
         body: JSON.stringify(indexedTransactions),
         headers: {
